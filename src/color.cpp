@@ -21,6 +21,8 @@ Color::uint32() const {
     // windows with mingw
 #elif __MINGW32__
     uint32_t value = (A << 24) | (R << 16) | (G << 8) | B;
+#elif __linux
+    uint32_t value = (A << 24) | (R << 16) | (G << 8) | B;
 #endif
     return value;
 }

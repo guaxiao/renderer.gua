@@ -1,4 +1,4 @@
-.PHONY : mingw osx clean
+.PHONY : mingw osx linux clean
 
 CC = g++
 CFLAGS = -Wall -Isrc
@@ -35,6 +35,15 @@ osx : LDFLAGS += $(FRAMEWORKS)
 osx : SRC += platform/osx/main.mm platform/osx/SDLMain.m
 
 osx : $(SRC) gua
+
+
+linux : OS := linux
+linux : TARGET := gua3d
+linux : CFLAGS += -std=c++11 
+linux : LDFLAGS += -lSDL
+linux : SRC += platform/linux/main.cpp
+
+linux : $(SRC) gua
 
 
 gua :
