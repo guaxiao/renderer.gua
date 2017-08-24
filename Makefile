@@ -1,18 +1,13 @@
 .PHONY : mingw osx clean
 
 CC = g++
-CFLAGS = -Wall -Isrc
+CFLAGS = -Wall -Isrc -O2
 LDFLAGS :=
 
 
 GUA3D := \
-src/window.cpp \
 src/canvas.cpp \
-src/color.cpp \
-src/vector.cpp \
-src/vertex.cpp \
 src/mesh.cpp \
-src/texture.cpp \
 src/guaimage.cpp
 
 

@@ -12,7 +12,7 @@
 class Matrix {
 public:
     float p[16];
-    
+
     Matrix() {
         for(int i = 0; i < 16; i++) {
             p[i] = 0;
@@ -20,11 +20,9 @@ public:
     };
 
     Matrix(float values[]) {
-        for(int i = 0; i < 16; i++) {
-            p[i] = values[i];
-        }
+        memcpy(p, values, sizeof(float)*16);
     };
-    
+
     bool operator==(const Matrix &m) const {
         bool equal = true;
         for (int i = 0; i < 16; i++) {
@@ -42,12 +40,12 @@ public:
         };
         return Matrix(values);
     };
-    
+
     static Matrix lookAtLH(const Vector &eye, const Vector &target, const Vector &up) {
         Vector axisZ = (target - eye).normalize();
         Vector axisX = up.cross(axisZ).normalize();
         Vector axisY = axisZ.cross(axisX).normalize();
-        
+
         float eyeX = -axisX.dot(eye);
         float eyeY = -axisY.dot(eye);
         float eyeZ = -axisZ.dot(eye);
@@ -58,7 +56,7 @@ public:
             axisX.z, axisY.z, axisZ.z, 0,
             eyeX,    eyeY,    eyeZ,    1,
         };
-        
+
         return Matrix(values);
     };
 
@@ -73,7 +71,7 @@ public:
         };
         return Matrix(values);
     };
-    
+
     static Matrix rotationX(float angle) {
         float s = sinf(angle);
         float c = cosf(angle);
@@ -85,7 +83,7 @@ public:
         };
         return Matrix(values);
     }
-    
+
     static Matrix rotationY(float angle) {
         float s = sinf(angle);
         float c = cosf(angle);
@@ -97,7 +95,7 @@ public:
         };
         return Matrix(values);
     }
-  
+
     static Matrix rotationZ(float angle) {
         float s = sinf(angle);
         float c = cosf(angle);
@@ -116,7 +114,7 @@ public:
         Matrix z = Matrix::rotationZ(r.z);
         return z * x * y;
     }
-    
+
     static Matrix translation(const Vector &t) {
         float values[16] = {
             1, 0, 0, 0,
@@ -126,7 +124,7 @@ public:
         };
         return Matrix(values);
     }
-    
+
     static Matrix scale(const Vector &s) {
         float values[16] = {
             s.x, 0,   0,    0,
