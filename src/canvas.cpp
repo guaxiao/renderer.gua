@@ -53,14 +53,20 @@ Canvas::drawScanline(const Vertex &v1, const Vertex &v2, int y, const Texture *t
     int sign = ((((unsigned)(x1 - x2)) >> 30) & 0x2) - 1;
     float factor = 0;
 
-    for (int x = x1, i = 0; i < (x2 - x1) * sign + 1; i++, x += sign) {
-        if (x2 != x1) {
-            factor = (float)(x - x1) / (x2 - x1);
-        }
-        auto v = v1.interpolate(v2, factor);
-        auto color = texture->sample(v.u, v.v);
+    if (x2 != x1) {
+        // May lose a bit of precision but this should be faster
+        float recFactor = 1.0f/(x2 - x1);
 
-        drawPoint(v.position, color);
+        for (int x = x1, i = 0; i < (x2 - x1) * sign + 1; i++, x += sign) {
+            factor = (x - x1)*recFactor;
+
+            auto v = v1.interpolate(v2, factor);
+            auto color = texture->sample(v.u, v.v);
+
+            drawPoint(v.position, color);
+        }
+    } else {
+        drawPoint(v1.position, texture->sample(v1.u, v1.v));
     }
 }
 
@@ -85,25 +91,34 @@ Canvas::drawTriangle(const Vertex &v1, const Vertex &v2, const Vertex &v3, const
 
     int startY = a->position.y;
     int endY = b->position.y;
-    for (int y = startY; y <= endY; ++y) {
-        float factor = 0;
-        if (endY != startY) {
-            factor = (float)(y - startY) / (endY - startY);
+
+    if (endY != startY) {
+        float recFactor = 1.0f/(endY - startY);
+        for (int y = startY; y <= endY; ++y) {
+            float factor = (y - startY)*recFactor;
+
+            Vertex va = a->interpolate(*b, factor);
+            Vertex vb = a->interpolate(middle, factor);
+            drawScanline(va, vb, y, texture);
         }
-        Vertex va = a->interpolate(*b, factor);
-        Vertex vb = a->interpolate(middle, factor);
-        drawScanline(va, vb, y, texture);
+    } else {
+        drawScanline(*a, *a, startY, texture);
     }
+
     startY = b->position.y;
     endY = c->position.y;
-    for (int y = startY; y <= endY; ++y) {
-        float factor = 0;
-        if (endY != startY) {
-            factor = (float)(y - startY) / (endY - startY);
+
+    if (endY != startY) {
+        float recFactor = 1.0f/(endY - startY);
+        for (int y = startY; y <= endY; ++y) {
+            float factor = (y - startY)*recFactor;
+
+            Vertex va = b->interpolate(*c, factor);
+            Vertex vb = middle.interpolate(*c, factor);
+            drawScanline(va, vb, y, texture);
         }
-        Vertex va = b->interpolate(*c, factor);
-        Vertex vb = middle.interpolate(*c, factor);
-        drawScanline(va, vb, y, texture);
+    } else {
+        drawScanline(*b, middle, startY, texture);
     }
 }
 
